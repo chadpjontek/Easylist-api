@@ -1,7 +1,7 @@
 {
-  "name": "node-user-authentication-boilerplate",
+  "name": "easylist-api",
   "version": "1.0.0",
-  "description": "A boilerplate for creating a node API server with user authentication. Includes email verification and json web tokens to authenticate protected routes.",
+  "description": "The api server for Easylist",
   "main": "server.js",
   "scripts": {
     "test": "karma start",
