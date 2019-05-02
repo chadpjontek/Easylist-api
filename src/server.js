@@ -22,6 +22,7 @@ app.use(express.json());
 
 // Routes
 app.use('/users', require('./routes/users'));
+app.use('/lists', require('./routes/lists'));
 
 // Start the server
 app.listen(process.env.PORT);
