@@ -243,16 +243,6 @@ const account = async (req, res) => {
   }
 };
 
-//TODO: move this to new file
-const newList = async (req, res) => {
-  try {
-    const { list } = req.body;
-    console.log(list);
-  } catch (error) {
-
-  }
-};
-
 module.exports = {
   signUp,
   verify,
