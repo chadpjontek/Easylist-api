@@ -1,3 +1,4 @@
+const List = require('../models/list');
 const getLists = async (req, res) => {
   const { user } = req;
   // TODO: Get the lists of the user
@@ -19,9 +20,22 @@ const editList = async (req, res) => {
   res.status(200).json({ msg: 'Here is the list to edit' });
 };
 
+/**
+ * Create list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
 const createList = async (req, res) => {
-  // TODO: Create a specific list
-  res.status(200).json({ msg: 'List created' });
+  try {
+    // Create a list
+    const { listName } = req.body;
+    const { user } = req;
+    const newList = new List({ listName, authorId: user });
+    await newList.save();
+    res.status(200).json({ msg: `"${listName}" created` });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 const updateList = async (req, res) => {

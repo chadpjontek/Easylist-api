@@ -60,7 +60,7 @@ router.route('/:id/edit')
  * createList route
  * Authenticate with token before calling createList controller
  */
-router.route('/:id/create')
+router.route('/create')
   .post(tokenAuth(), ListsController.createList);
 
 /**
