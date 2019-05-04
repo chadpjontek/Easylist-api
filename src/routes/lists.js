@@ -76,7 +76,7 @@ router.route('/:id/update')
 // ===============
 
 /**
- * DELETE /lists/:id/delete
+ * DELETE /lists/delete
  * deleteList route
  * Authenticate with token before calling deleteList controller
  */

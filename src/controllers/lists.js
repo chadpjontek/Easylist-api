@@ -43,9 +43,22 @@ const updateList = async (req, res) => {
   res.status(200).json({ msg: 'List updated' });
 };
 
+/**
+ * Delete list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
 const deleteList = async (req, res) => {
-  // TODO: Delete a specific list
-  res.status(200).json({ msg: 'List deleted' });
+  try {
+    // Delete a list
+    const list = await List.findByIdAndDelete({ _id: req.params.id });
+    if (!list) {
+      return res.status(404).json({ msg: 'No list found with this id.' });
+    }
+    res.status(200).json({ msg: 'List deleted' });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 module.exports = {
