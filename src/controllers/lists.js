@@ -1,8 +1,22 @@
 const List = require('../models/list');
+
+/**
+ * Get lists logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
 const getLists = async (req, res) => {
   const { user } = req;
-  // TODO: Get the lists of the user
-  res.status(200).json({ msg: `Here are ${user}'s lists'` });
+  try {
+    // Get lists
+    const lists = await List.find({ authorId: user });
+    if (!lists) {
+      return res.status(404).json({ msg: 'No lists found for this user.' });
+    }
+    res.status(200).json({ lists });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 const getList = async (req, res) => {
