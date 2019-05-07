@@ -69,7 +69,7 @@ router.route('/create')
  * Authenticate with token before calling updateList controller
  */
 router.route('/:id/update')
-  .post(tokenAuth(), ListsController.updateList);
+  .post(tokenAuth(), validateBody(schemas.updateList), ListsController.updateList);
 
 // ===============
 // DELETE REQUESTS

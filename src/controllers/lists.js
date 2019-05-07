@@ -1,4 +1,5 @@
 const List = require('../models/list');
+const ObjectId = require('mongoose').Types.ObjectId;
 
 /**
  * Get lists logic
@@ -30,7 +31,7 @@ const shareList = async (req, res) => {
 };
 
 const editList = async (req, res) => {
-  // TODO: Edit a specific list
+  // Edit a specific list - this should be handled on client with React Router and display the list with edit controls
   res.status(200).json({ msg: 'Here is the list to edit' });
 };
 
@@ -53,8 +54,33 @@ const createList = async (req, res) => {
 };
 
 const updateList = async (req, res) => {
-  // TODO: Update a specific list
-  res.status(200).json({ msg: 'List updated' });
+  // Update a specific list
+  try {
+    const { id } = req.params;
+    const { listName, items } = req.body;
+    const { user } = req;
+    const list = await List.findById(id);
+    // Make sure list belongs to user
+    if (list.authorId.toString() !== user) {
+      return res.status(401).json({ msg: 'This list cannot be edited by this user.' });
+    }
+    // If the listName has changed, update.
+    if (listName) {
+      console.log(listName);
+      list.listName = listName;
+    }
+    // If there are items, update.
+    if (items) {
+      console.log(items);
+      list.items = items;
+    }
+    // Save the list
+    list.items = items;
+    await list.save();
+    res.status(200).json({ msg: 'List updated' });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 /**

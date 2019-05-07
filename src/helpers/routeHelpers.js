@@ -2,6 +2,14 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
 
+/** Item subdocument schema for list schema */
+const item = Joi.object().keys({
+  content: Joi.string().required(),
+  linkedListId: Joi.string().regex(/^[a-fA-F0-9]{24}$/),
+  notificationsOn: Joi.boolean(),
+  orderedListOn: Joi.boolean(),
+  checkboxOn: Joi.boolean(),
+});
 /** Schema objects to validate against with Joi */
 const schemas = {
   /** User sign up validation schema */
@@ -29,6 +37,10 @@ const schemas = {
     username: Joi.string().alphanum().min(3).max(16).required(),
     code: Joi.string().required(),
     newPassword: Joi.string().required()
+  }),
+  updateList: Joi.object().keys({
+    listName: Joi.string().min(3).max(24),
+    items: Joi.array().items(item)
   })
 };
 
