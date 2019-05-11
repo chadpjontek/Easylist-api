@@ -71,6 +71,11 @@ const createList = async (req, res) => {
   }
 };
 
+/**
+ * Update list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
 const updateList = async (req, res) => {
   // Update a specific list
   try {
@@ -101,6 +106,11 @@ const updateList = async (req, res) => {
   }
 };
 
+/**
+ * Share list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
 const shareList = async (req, res) => {
   // Toggle whether the list is shared or not
   try {
