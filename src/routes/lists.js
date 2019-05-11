@@ -20,14 +20,6 @@ router.route('/:id')
 // POST REQUESTS
 // =============
 
-/**
- * POST /lists/:id/share
- * createList route
- * Authenticate with token before calling createList controller
- */
-router.route('/:id/share')
-  .post(ListsController.shareList);
-
 
 // ============================================================
 // PROTECTED ROUTES (requires user authorization before access)
@@ -70,6 +62,14 @@ router.route('/create')
  */
 router.route('/:id/update')
   .post(tokenAuth(), validateBody(schemas.updateList), ListsController.updateList);
+
+/**
+* POST /lists/:id/share
+* createList route
+* Authenticate with token before calling createList controller
+*/
+router.route('/:id/share')
+  .post(tokenAuth(), ListsController.shareList);
 
 // ===============
 // DELETE REQUESTS

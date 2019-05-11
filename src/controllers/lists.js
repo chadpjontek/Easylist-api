@@ -26,15 +26,18 @@ const getLists = async (req, res) => {
  * @param {Object} res HTTP response object
  */
 const getList = async (req, res) => {
-  // Get list to edit
-  const { id } = req.params;
-  const list = await List.findById(id);
-  res.status(200).json({ list });
-};
-
-const shareList = async (req, res) => {
-  // TODO: Create a shared list
-  res.status(200).json({ msg: 'Shared list created' });
+  // Get list to edit if public
+  try {
+    const { id } = req.params;
+    const list = await List.findById(id)
+      .where('isPrivate').equals(false);
+    if (!list) {
+      return res.status(401).json({ msg: 'Your request did not return a public list.' });
+    }
+    res.status(200).json({ list });
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 /**
@@ -93,6 +96,27 @@ const updateList = async (req, res) => {
     list.items = items;
     await list.save();
     res.status(200).json({ msg: 'List updated' });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+const shareList = async (req, res) => {
+  // Toggle whether the list is shared or not
+  try {
+    // Get the list
+    const { id } = req.params;
+    const { user } = req;
+    const list = await List.findById(id);
+    // Make sure list belongs to user
+    if (list.authorId.toString() !== user) {
+      return res.status(401).json({ msg: 'This list cannot be edited by this user.' });
+    }
+    // Change shared status in database
+    list.isPrivate = !list.isPrivate;
+    await list.save();
+    const resMsg = list.isPrivate ? 'Your list is now private.' : 'Your list is now shareable.';
+    res.status(200).json({ msg: resMsg });
   } catch (error) {
     throw new Error(error);
   }

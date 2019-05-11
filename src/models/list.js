@@ -37,7 +37,10 @@ const listSchema = new Schema({
     ref: 'User'
   },
   items: [itemSchema],
-  url: String,
+  isPrivate: {
+    type: Boolean,
+    default: true
+  },
   createdAt: {
     type: Date,
     default: Date.now()
