@@ -32,7 +32,10 @@ const shareList = async (req, res) => {
 
 const editList = async (req, res) => {
   // Edit a specific list - this should be handled on client with React Router and display the list with edit controls
-  res.status(200).json({ msg: 'Here is the list to edit' });
+  // Get list to edit
+  const { id } = req.params;
+  const list = await List.findById(id);
+  res.status(200).json({ list });
 };
 
 /**
