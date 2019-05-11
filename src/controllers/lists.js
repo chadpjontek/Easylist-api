@@ -20,9 +20,16 @@ const getLists = async (req, res) => {
   }
 };
 
+/**
+ * Get list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res HTTP response object
+ */
 const getList = async (req, res) => {
-  // TODO: Get a specific list
-  res.status(200).json({ msg: 'Here is the list' });
+  // Get list to edit
+  const { id } = req.params;
+  const list = await List.findById(id);
+  res.status(200).json({ list });
 };
 
 const shareList = async (req, res) => {
