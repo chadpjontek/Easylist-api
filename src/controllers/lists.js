@@ -30,6 +30,11 @@ const shareList = async (req, res) => {
   res.status(200).json({ msg: 'Shared list created' });
 };
 
+/**
+ * Edit list logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res HTTP response object
+ */
 const editList = async (req, res) => {
   // Edit a specific list - this should be handled on client with React Router and display the list with edit controls
   // Get list to edit
