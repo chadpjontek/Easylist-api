@@ -1,5 +1,4 @@
 const List = require('../models/list');
-const ObjectId = require('mongoose').Types.ObjectId;
 
 /**
  * Get lists logic

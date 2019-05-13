@@ -38,6 +38,7 @@ const schemas = {
     code: Joi.string().required(),
     newPassword: Joi.string().required()
   }),
+  /** Update list validation schema */
   updateList: Joi.object().keys({
     listName: Joi.string().min(3).max(24),
     items: Joi.array().items(item)
