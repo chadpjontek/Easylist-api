@@ -60,11 +60,11 @@ const editList = async (req, res) => {
 const createList = async (req, res) => {
   try {
     // Create a list
-    const { listName } = req.body;
+    const { name } = req.body;
     const { user } = req;
-    const newList = new List({ listName, authorId: user });
+    const newList = new List({ name, authorId: user });
     await newList.save();
-    res.status(200).json({ msg: `"${listName}" created` });
+    res.status(200).json({ msg: `"${name}" created` });
   } catch (error) {
     throw new Error(error);
   }
@@ -79,26 +79,27 @@ const updateList = async (req, res) => {
   // Update a specific list
   try {
     const { id } = req.params;
-    const { listName, items } = req.body;
+    const { name, url, backgroundColor, notificationsOn, } = req.body;
     const { user } = req;
     const list = await List.findById(id);
     // Make sure list belongs to user
     if (list.authorId.toString() !== user) {
       return res.status(401).json({ msg: 'This list cannot be edited by this user.' });
     }
-    // If the listName has changed, update.
-    if (listName) {
-      console.log(listName);
-      list.listName = listName;
-    }
-    // If there are items, update.
-    if (items) {
-      console.log(items);
-      list.items = items;
-    }
-    // Save the list
-    list.items = items;
-    await list.save();
+    await list.updateOne({ name, url, backgroundColor, notificationsOn });
+    // // If the name has changed, update.
+    // if (name) {
+    //   console.log(name);
+    //   list.name = name;
+    // }
+    // // If there are items, update.
+    // if (items) {
+    //   console.log(items);
+    //   list.items = items;
+    // }
+    // // Save the list
+    // list.items = items;
+    // await list.save();
     res.status(200).json({ msg: 'List updated' });
   } catch (error) {
     throw new Error(error);

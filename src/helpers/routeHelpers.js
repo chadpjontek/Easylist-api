@@ -40,8 +40,10 @@ const schemas = {
   }),
   /** Update list validation schema */
   updateList: Joi.object().keys({
-    listName: Joi.string().min(3).max(24),
-    items: Joi.array().items(item)
+    name: Joi.string().min(1).max(24),
+    html: Joi.string(),
+    backgroundColor: Joi.string(),
+    notificationsOn: Joi.bool()
   })
 };
 

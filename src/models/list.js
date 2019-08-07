@@ -1,34 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create item schema
-const itemSchema = new Schema({
-  content: {
-    type: String,
-    required: true
-  },
-  linkedListId: String,
-  notificationsOn: {
-    type: Boolean,
-    default: false
-  },
-  orderedListOn: {
-    type: Boolean,
-    default: false
-  },
-  checkboxOn: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now()
-  }
-});
-
 // Create the list schema
 const listSchema = new Schema({
-  listName: {
+  name: {
     type: String,
     required: true
   },
@@ -36,10 +11,15 @@ const listSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
-  items: [itemSchema],
+  html: String,
+  backgroundColor: String,
   isPrivate: {
     type: Boolean,
     default: true
+  },
+  notificationsOn: {
+    type: Boolean,
+    default: false
   },
   createdAt: {
     type: Date,
