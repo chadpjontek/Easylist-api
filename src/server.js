@@ -2,12 +2,16 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
+const cors = require('cors');
 
 const { DB_URI } = require('./config');
 
 require('dotenv').config();
 
 const app = express();
+
+//TODO: add whtelist to cors
+app.use(cors());
 
 // Connect to mongoDB with mongoose. Handle depreciation warnings.
 mongoose.connect(DB_URI, {
@@ -21,8 +25,8 @@ app.use(morgan('dev'));
 app.use(express.json());
 
 // Routes
-app.use('/users', require('./routes/users'));
-app.use('/lists', require('./routes/lists'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/lists', require('./routes/lists'));
 
 // Start the server
 app.listen(process.env.PORT);

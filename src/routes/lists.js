@@ -16,6 +16,7 @@ const ListsController = require('../controllers/lists');
  */
 router.route('/:id')
   .get(ListsController.getList);
+
 // =============
 // POST REQUESTS
 // =============
@@ -48,28 +49,32 @@ router.route('/:id/edit')
 // =============
 
 /**
- * POST /lists/:id/create
+ * POST /lists
  * createList route
  * Authenticate with token before calling createList controller
  */
-router.route('/create')
+router.route('/')
   .post(tokenAuth(), ListsController.createList);
-
-/**
- * POST /lists/:id/update
- * updateList route
- * Authenticate with token before calling updateList controller
- */
-router.route('/:id/update')
-  .post(tokenAuth(), validateBody(schemas.updateList), ListsController.updateList);
 
 /**
 * POST /lists/:id/share
 * createList route
-* Authenticate with token before calling createList controller
+* Authenticate with token before calling shareList controller
 */
 router.route('/:id/share')
   .post(tokenAuth(), ListsController.shareList);
+
+// ===============
+// UPDATE REQUESTS
+// ===============
+
+/**
+ * PUT /lists/:id
+ * updateList route
+ * Authenticate with token before calling updateList controller
+ */
+router.route('/:id')
+  .put(tokenAuth(), validateBody(schemas.updateList), ListsController.updateList);
 
 // ===============
 // DELETE REQUESTS
