@@ -26,7 +26,7 @@ const signUp = async (req, res) => {
     // Send email verification
     sendEmailVerification(email, username, newUser.verificationCode.value);
     // Respond with success message
-    res.status(200).json({ message: 'Your account has been created. Please verify it by clicking the activation link that has been sent to your email.' });
+    res.status(200).json({ message: 'Sign up successful! Check your email to verify your account and finalize account creation.' });
   } catch (error) {
     throw new Error(error);
   }
