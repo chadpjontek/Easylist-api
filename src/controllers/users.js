@@ -26,7 +26,7 @@ const signUp = async (req, res) => {
     // Send email verification
     sendEmailVerification(email, username, newUser.verificationCode.value);
     // Respond with success message
-    res.status(200).json({ message: 'Sign up successful! Check your email to verify your account and finalize account creation.' });
+    res.status(200).json({ message: 'Sign up successful! Check your email to verify and finalize your account. You may need to check your spam folder if you don\'t see it.' });
   } catch (error) {
     throw new Error(error);
   }
@@ -43,17 +43,20 @@ const verify = async (req, res) => {
     // Check if there is an account with this username
     const foundUser = await User.findOne({ username });
     if (!foundUser) {
-      return res.status(404).json({ error: 'There is no account associated with this username.' });
+      const msg = encodeURIComponent('There is no account associated with this username.');
+      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
     }
     // Check if the account is already verified
     if (foundUser.isVerified) {
-      return res.status(200).json({ message: 'This account has already been verified. You can log in now.' });
+      const msg = encodeURIComponent('This account has already been verified. You can log in now.');
+      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
     }
     // Check if the verification code matches the activation hash
     const isMatch = await foundUser.isVerifiedEmail(code);
     // If not, handle it
     if (!isMatch) {
-      return res.status(401).json({ error: 'The verification code does not match.' });
+      const msg = encodeURIComponent('The verification code does not match.');
+      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
     };
     // If verification code is older than 3 hours, reject with reason
     const currentTime = Date.now();
@@ -65,15 +68,17 @@ const verify = async (req, res) => {
       foundUser.activationHash = await createHash(verificationCode);
       await foundUser.save();
       await sendEmailVerification(foundUser.email, username, foundUser.verificationCode.value);
-      return res.status(401).json({ error: 'The verification code has expired. A new code has been sent to your email.' });
+      const msg = encodeURIComponent('The verification code has expired. A new code has been sent to your email.');
+      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
     }
     // Update user as being verified and delete codes
     foundUser.isVerified = true;
     foundUser.verificationCode = { value: null, createdAt: null };
     foundUser.activationHash = null;
     await foundUser.save();
-    // Respond with verification success message
-    res.status(200).json({ message: 'Your account has been verified. You can now log in.' });
+    // Send to sign in page with a popup message that states account being verified
+    const msg = encodeURIComponent('Your account has been verified! You can now sign in.');
+    res.redirect('http://localhost:8080/signin/?msg=' + msg);
   } catch (error) {
     throw new Error(error);
   }
