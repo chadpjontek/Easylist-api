@@ -54,15 +54,23 @@ router.route('/:id/edit')
  * Authenticate with token before calling createList controller
  */
 router.route('/')
-  .post(tokenAuth(), ListsController.createList);
+  .post(tokenAuth(), validateBody(schemas.createList), ListsController.createList);
 
 /**
 * POST /lists/:id/share
-* createList route
+* shareList route
 * Authenticate with token before calling shareList controller
 */
 router.route('/:id/share')
-  .post(tokenAuth(), ListsController.shareList);
+  .put(tokenAuth(), ListsController.shareList);
+
+/**
+* POST /lists/:id/copy
+* copyList route
+* Authenticate with token before calling copyList controller
+*/
+router.route('/:id/copy')
+  .post(tokenAuth(), ListsController.copyList);
 
 // ===============
 // UPDATE REQUESTS
@@ -85,7 +93,7 @@ router.route('/:id')
  * deleteList route
  * Authenticate with token before calling deleteList controller
  */
-router.route('/:id/delete')
+router.route('/:id')
   .delete(tokenAuth(), ListsController.deleteList);
 
 

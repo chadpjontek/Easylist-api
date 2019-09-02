@@ -1,4 +1,5 @@
 const List = require('../models/list');
+const { cleanHTML } = require('../helpers/controllerHelpers');
 
 /**
  * Get lists logic
@@ -11,7 +12,7 @@ const getLists = async (req, res) => {
     // Get lists
     const lists = await List.find({ authorId: user });
     if (!lists) {
-      return res.status(404).json({ msg: 'No lists found for this user.' });
+      return res.status(404).json({ error: 'No lists found for this user.' });
     }
     res.status(200).json({ lists });
   } catch (error) {
@@ -31,7 +32,7 @@ const getList = async (req, res) => {
     const list = await List.findById(id)
       .where('isPrivate').equals(false);
     if (!list) {
-      return res.status(401).json({ msg: 'Your request did not return a public list.' });
+      return res.status(401).json({ error: 'Your request did not return a public list.' });
     }
     res.status(200).json({ list });
   } catch (error) {
@@ -60,11 +61,18 @@ const editList = async (req, res) => {
 const createList = async (req, res) => {
   try {
     // Create a list
-    const { name } = req.body;
+    const { html, name, backgroundColor, updatedAt, notificationsOn, isPrivate } = req.body;
     const { user } = req;
-    const newList = new List({ name, authorId: user });
-    await newList.save();
-    res.status(200).json({ msg: `"${name}" created` });
+    // Sanitize HTML before inserting
+    const clean = await cleanHTML(html);
+    const newList = new List({
+      name, backgroundColor, updatedAt, notificationsOn, isPrivate, html: clean, authorId: user
+    });
+    await newList.save((err, list) => {
+      if (err) return `Error occurred while saving ${err}`;
+      // respond with the list
+      return res.status(200).json({ list });
+    });
   } catch (error) {
     throw new Error(error);
   }
@@ -79,27 +87,16 @@ const updateList = async (req, res) => {
   // Update a specific list
   try {
     const { id } = req.params;
-    const { name, url, backgroundColor, notificationsOn, } = req.body;
+    const { name, html, backgroundColor, notificationsOn, isPrivate, updatedAt } = req.body;
     const { user } = req;
     const list = await List.findById(id);
     // Make sure list belongs to user
     if (list.authorId.toString() !== user) {
-      return res.status(401).json({ msg: 'This list cannot be edited by this user.' });
+      return res.status(401).json({ error: 'This list cannot be edited by this user.' });
     }
-    await list.updateOne({ name, url, backgroundColor, notificationsOn });
-    // // If the name has changed, update.
-    // if (name) {
-    //   console.log(name);
-    //   list.name = name;
-    // }
-    // // If there are items, update.
-    // if (items) {
-    //   console.log(items);
-    //   list.items = items;
-    // }
-    // // Save the list
-    // list.items = items;
-    // await list.save();
+    // Sanitize HTML before inserting
+    const clean = cleanHTML(html);
+    await list.updateOne({ name, html: clean, backgroundColor, notificationsOn, isPrivate, updatedAt });
     res.status(200).json({ msg: 'List updated' });
   } catch (error) {
     throw new Error(error);
@@ -120,17 +117,55 @@ const shareList = async (req, res) => {
     const list = await List.findById(id);
     // Make sure list belongs to user
     if (list.authorId.toString() !== user) {
-      return res.status(401).json({ msg: 'This list cannot be edited by this user.' });
+      return res.status(401).json({ error: 'This list cannot be edited by this user.' });
     }
     // Change shared status in database
     list.isPrivate = !list.isPrivate;
     await list.save();
-    const resMsg = list.isPrivate ? 'Your list is now private.' : 'Your list is now shareable.';
+    const resMsg = list.isPrivate ? 'Your list is now private.' : 'A link to your list has been copied to your clipboard. Share it with whomever you like!';
     res.status(200).json({ msg: resMsg });
   } catch (error) {
     throw new Error(error);
   }
 };
+
+//TODO: handle copy of shared list
+const copyList = async (req, res) => {
+  try {
+    // Get the list
+    const { id } = req.params;
+    const list = await List.findById(id);
+    // Check if list is private
+    if (list.isPrivate) {
+      return res.status(401).json({ error: 'This list is private' });
+    }
+    // Get user who wants to make a copy
+    const { user } = req;
+    // Check if the user is the same as the creator
+    if (user === list.authorId) {
+      return res.status(401).json({ error: 'This is your list.' });
+    }
+    // Check if user already has this list
+    const query = await List.find({ authorId: user, copiedFrom: id });
+    if (query.length > 0) {
+      console.log(query.length);
+      return res.status(401).json({ error: 'You already have a copy of this list' });
+    }
+    // Make the copy
+    const { name, html, backgroundColor } = list;
+    const listCopy = new List({
+      name, html, backgroundColor, authorId: user, copiedFrom: id, isFinished: false
+    });
+    await listCopy.save((err, list) => {
+      if (err) return `Error occurred while saving ${err}`;
+      // respond with the list
+      return res.status(200).json({ list });
+    });
+  } catch (error) {
+
+  }
+};
+
 
 /**
  * Delete list logic
@@ -138,11 +173,12 @@ const shareList = async (req, res) => {
  * @param {Object} res - HTTP response object
  */
 const deleteList = async (req, res) => {
+  console.log(req.params);
   try {
     // Delete a list
     const list = await List.findByIdAndDelete({ _id: req.params.id });
     if (!list) {
-      return res.status(404).json({ msg: 'No list found with this id.' });
+      return res.status(404).json({ error: 'No list found with this id.' });
     }
     res.status(200).json({ msg: 'List deleted' });
   } catch (error) {
@@ -154,6 +190,7 @@ module.exports = {
   getLists,
   getList,
   shareList,
+  copyList,
   editList,
   createList,
   updateList,

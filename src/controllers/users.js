@@ -26,7 +26,7 @@ const signUp = async (req, res) => {
     // Send email verification
     sendEmailVerification(email, username, newUser.verificationCode.value);
     // Respond with success message
-    res.status(200).json({ message: 'Sign up successful! Check your email to verify and finalize your account. You may need to check your spam folder if you don\'t see it.' });
+    res.status(200).json({ msg: 'Sign up successful! Check your email to verify and finalize your account. You may need to check your spam folder if you don\'t see it.' });
   } catch (error) {
     throw new Error(error);
   }
@@ -137,8 +137,8 @@ const passwordRecovery = async (req, res) => {
     await foundUser.save();
     // Send password recovery email
     await sendPasswordRecoveryEmail(email, foundUser.username, foundUser.pwRecoveryCode.value);
-    // Respond with verification success message
-    res.status(200).json({ message: 'An email has been sent to the address you provided with instructions to reset your password.' });
+    // Respond with verification success msg
+    res.status(200).json({ msg: 'An email has been sent to the address you provided with instructions to reset your password.' });
   } catch (error) {
     throw new Error(error);
   }

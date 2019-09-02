@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const sanitizeHtml = require('sanitize-html');
 const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, PROTOCOL, DOMAIN } = require('../config');
 
 /**
@@ -174,10 +175,21 @@ const updatePassword = async (user, newPassword) => {
   }
 };
 
+const cleanHTML = (html) => {
+  const clean = sanitizeHtml(html, {
+    allowedTags: ['b', 'i', 'ol', 'ul', 'li', 'a', 'br'],
+    allowedAttributes: {
+      'a': ['href']
+    }
+  });
+  return clean;
+};
+
 module.exports = {
   sendEmailVerification,
   sendPasswordRecoveryEmail,
   signToken,
   createHash,
-  updatePassword
+  updatePassword,
+  cleanHTML
 };

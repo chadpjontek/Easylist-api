@@ -2,14 +2,6 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
 
-/** Item subdocument schema for list schema */
-const item = Joi.object().keys({
-  content: Joi.string().required(),
-  linkedListId: Joi.string().regex(/^[a-fA-F0-9]{24}$/),
-  notificationsOn: Joi.boolean(),
-  orderedListOn: Joi.boolean(),
-  checkboxOn: Joi.boolean(),
-});
 /** Schema objects to validate against with Joi */
 const schemas = {
   /** User sign up validation schema */
@@ -38,12 +30,23 @@ const schemas = {
     code: Joi.string().required(),
     newPassword: Joi.string().required()
   }),
+  /** Create list validation schema */
+  createList: Joi.object().keys({
+    name: Joi.string().min(1).max(24).required(),
+    html: Joi.string().required(),
+    backgroundColor: Joi.string().required(),
+    updatedAt: Joi.date().required(),
+    isPrivate: Joi.bool().required(),
+    notificationsOn: Joi.bool().required()
+  }),
   /** Update list validation schema */
   updateList: Joi.object().keys({
-    name: Joi.string().min(1).max(24),
-    html: Joi.string(),
-    backgroundColor: Joi.string(),
-    notificationsOn: Joi.bool()
+    name: Joi.string().min(1).max(24).required(),
+    html: Joi.string().required(),
+    backgroundColor: Joi.string().required(),
+    notificationsOn: Joi.bool().required(),
+    isPrivate: Joi.bool().required(),
+    updatedAt: Joi.date().required()
   })
 };
 
@@ -68,7 +71,7 @@ const tokenAuth = () => {
     const token = req.header('x-auth-token');
     // Check for token
     if (!token) {
-      return res.status(401).json({ msg: 'No token, authorization denied' });
+      return res.status(401).json({ error: 'No token, authorization denied' });
     }
     try {
       // Verify token
@@ -77,7 +80,7 @@ const tokenAuth = () => {
       req.user = decoded.subject;
       next();
     } catch (error) {
-      res.status(400).json({ msg: 'Token is not valid' });
+      res.status(400).json({ error: 'Token is not valid' });
     }
   };
 };

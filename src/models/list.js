@@ -21,10 +21,12 @@ const listSchema = new Schema({
     type: Boolean,
     default: false
   },
-  createdAt: {
+  updatedAt: {
     type: Date,
     default: Date.now()
-  }
+  },
+  copiedFrom: String,
+  isFinished: Boolean
 });
 
 // Create a model
