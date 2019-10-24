@@ -3,24 +3,12 @@ const router = require('express-promise-router')();
 const { validateBody, schemas, tokenAuth, userAuth } = require('../helpers/routeHelpers');
 const ListsController = require('../controllers/lists');
 
-// ================================================
-// NON-PROTECTED ROUTES (no authorization required)
-// ================================================
-// GET REQUESTS
-// ============
-
 /**
- * GET /lists/:id
- * get list route
- * call getList controller
- */
-router.route('/:id')
-  .get(ListsController.getList);
-
-// =============
-// POST REQUESTS
-// =============
-
+* GET /lists/:id/copy
+* copyList route
+*/
+router.route('/:id/copy')
+  .get(ListsController.getCopy);
 
 // ============================================================
 // PROTECTED ROUTES (requires user authorization before access)
@@ -35,6 +23,14 @@ router.route('/:id')
  */
 router.route('/')
   .get(tokenAuth(), ListsController.getLists);
+
+/**
+ * GET /lists/:id
+ * get list route
+ * call getList controller
+ */
+router.route('/:id')
+  .get(tokenAuth(), ListsController.getList);
 
 /**
  * GET /lists/:id/edit
@@ -56,21 +52,6 @@ router.route('/:id/edit')
 router.route('/')
   .post(tokenAuth(), validateBody(schemas.createList), ListsController.createList);
 
-/**
-* POST /lists/:id/share
-* shareList route
-* Authenticate with token before calling shareList controller
-*/
-router.route('/:id/share')
-  .put(tokenAuth(), ListsController.shareList);
-
-/**
-* POST /lists/:id/copy
-* copyList route
-* Authenticate with token before calling copyList controller
-*/
-router.route('/:id/copy')
-  .post(tokenAuth(), ListsController.copyList);
 
 // ===============
 // UPDATE REQUESTS
@@ -83,6 +64,14 @@ router.route('/:id/copy')
  */
 router.route('/:id')
   .put(tokenAuth(), validateBody(schemas.updateList), ListsController.updateList);
+
+/**
+* PUT /lists/:id/share
+* shareList route
+* Authenticate with token before calling shareList controller
+*/
+router.route('/:id/share')
+  .put(tokenAuth(), ListsController.shareList);
 
 // ===============
 // DELETE REQUESTS

@@ -37,7 +37,9 @@ const schemas = {
     backgroundColor: Joi.string().required(),
     updatedAt: Joi.date().required(),
     isPrivate: Joi.bool().required(),
-    notificationsOn: Joi.bool().required()
+    notificationsOn: Joi.bool().required(),
+    isFinished: Joi.bool(),
+    copiedFrom: Joi.string().allow('')
   }),
   /** Update list validation schema */
   updateList: Joi.object().keys({
@@ -46,7 +48,9 @@ const schemas = {
     backgroundColor: Joi.string().required(),
     notificationsOn: Joi.bool().required(),
     isPrivate: Joi.bool().required(),
-    updatedAt: Joi.date().required()
+    updatedAt: Joi.date().required(),
+    isFinished: Joi.bool(),
+    copiedFrom: Joi.string().allow('')
   })
 };
 

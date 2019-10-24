@@ -1,6 +1,6 @@
 const List = require('../models/list');
 const { cleanHTML } = require('../helpers/controllerHelpers');
-
+const { PROTOCOL, DOMAIN } = require('../config');
 /**
  * Get lists logic
  * @param {Object} req - HTTP request object
@@ -26,13 +26,13 @@ const getLists = async (req, res) => {
  * @param {Object} res HTTP response object
  */
 const getList = async (req, res) => {
-  // Get list to edit if public
+  const { user } = req;
   try {
     const { id } = req.params;
     const list = await List.findById(id)
-      .where('isPrivate').equals(false);
+      .where('authorId').equals(user);
     if (!list) {
-      return res.status(401).json({ error: 'Your request did not return a public list.' });
+      return res.status(401).json({ error: 'Your request did not return a list.' });
     }
     res.status(200).json({ list });
   } catch (error) {
@@ -61,12 +61,12 @@ const editList = async (req, res) => {
 const createList = async (req, res) => {
   try {
     // Create a list
-    const { html, name, backgroundColor, updatedAt, notificationsOn, isPrivate } = req.body;
+    const { html, name, backgroundColor, updatedAt, notificationsOn, isPrivate, isFinished, copiedFrom } = req.body;
     const { user } = req;
     // Sanitize HTML before inserting
     const clean = await cleanHTML(html);
     const newList = new List({
-      name, backgroundColor, updatedAt, notificationsOn, isPrivate, html: clean, authorId: user
+      name, backgroundColor, updatedAt, notificationsOn, isPrivate, html: clean, authorId: user, isFinished, copiedFrom
     });
     await newList.save((err, list) => {
       if (err) return `Error occurred while saving ${err}`;
@@ -87,7 +87,7 @@ const updateList = async (req, res) => {
   // Update a specific list
   try {
     const { id } = req.params;
-    const { name, html, backgroundColor, notificationsOn, isPrivate, updatedAt } = req.body;
+    const { name, html, backgroundColor, notificationsOn, isPrivate, updatedAt, isFinished, copiedFrom } = req.body;
     const { user } = req;
     const list = await List.findById(id);
     // Make sure list belongs to user
@@ -96,7 +96,7 @@ const updateList = async (req, res) => {
     }
     // Sanitize HTML before inserting
     const clean = cleanHTML(html);
-    await list.updateOne({ name, html: clean, backgroundColor, notificationsOn, isPrivate, updatedAt });
+    await list.updateOne({ name, html: clean, backgroundColor, notificationsOn, isPrivate, updatedAt, isFinished, copiedFrom });
     res.status(200).json({ msg: 'List updated' });
   } catch (error) {
     throw new Error(error);
@@ -123,46 +123,42 @@ const shareList = async (req, res) => {
     list.isPrivate = !list.isPrivate;
     await list.save();
     const resMsg = list.isPrivate ? 'Your list is now private.' : 'A link to your list has been copied to your clipboard. Share it with whomever you like!';
-    res.status(200).json({ msg: resMsg });
+    // TODO: remove hardcoded url
+    res.status(200).json({
+      msg: resMsg,
+      link: `http://localhost:8080/lists/${id}/shared`
+    });
   } catch (error) {
     throw new Error(error);
   }
 };
 
-//TODO: handle copy of shared list
-const copyList = async (req, res) => {
+/**
+ * Get copy logic
+ * @param {Object} req - HTTP request object
+ * @param {Object} res - HTTP response object
+ */
+const getCopy = async (req, res) => {
   try {
     // Get the list
     const { id } = req.params;
     const list = await List.findById(id);
+    // Make sure there is a list
+    if (!list) {
+      return res.status(401).json({ error: 'Your request did not return a list.' });
+    }
     // Check if list is private
     if (list.isPrivate) {
       return res.status(401).json({ error: 'This list is private' });
     }
-    // Get user who wants to make a copy
-    const { user } = req;
-    // Check if the user is the same as the creator
-    if (user === list.authorId) {
-      return res.status(401).json({ error: 'This is your list.' });
-    }
-    // Check if user already has this list
-    const query = await List.find({ authorId: user, copiedFrom: id });
-    if (query.length > 0) {
-      console.log(query.length);
-      return res.status(401).json({ error: 'You already have a copy of this list' });
-    }
     // Make the copy
     const { name, html, backgroundColor } = list;
-    const listCopy = new List({
-      name, html, backgroundColor, authorId: user, copiedFrom: id, isFinished: false
-    });
-    await listCopy.save((err, list) => {
-      if (err) return `Error occurred while saving ${err}`;
-      // respond with the list
-      return res.status(200).json({ list });
-    });
+    list.copiedFrom = id;
+    list.isFinished = false;
+    // respond with the list
+    return res.status(200).json({ list });
   } catch (error) {
-
+    throw new Error(error);
   }
 };
 
@@ -190,7 +186,7 @@ module.exports = {
   getLists,
   getList,
   shareList,
-  copyList,
+  getCopy,
   editList,
   createList,
   updateList,
