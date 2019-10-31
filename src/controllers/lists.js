@@ -1,5 +1,6 @@
 const List = require('../models/list');
-const { cleanHTML } = require('../helpers/controllerHelpers');
+const User = require('../models/user');
+const { cleanHTML, sendListCompletionNotification } = require('../helpers/controllerHelpers');
 const { PROTOCOL, DOMAIN } = require('../config');
 /**
  * Get lists logic
@@ -162,6 +163,32 @@ const getCopy = async (req, res) => {
   }
 };
 
+// TODO:
+const completeList = async (req, res) => {
+  // Complete a specific list
+  try {
+    const { id } = req.params;
+    const { user } = req;
+    const list = await List.findById(id);
+    // exit if already finished
+    if (list.isFinished) return res.status(401).json({ error: 'already finished' });
+    // find the user who shared list
+    const originalList = await List.findById(list.copiedFrom);
+    // exit if notifications are off
+    if (!originalList.notificationsOn) return res.status(401).json({ error: 'notifications off' });
+    const sharedBy = await User.findById(originalList.authorId);
+    // find the username of the user who finished the list
+    const finishedBy = await User.findById(user);
+    await sendListCompletionNotification(list.name, sharedBy.email, sharedBy.username, finishedBy.username);
+    // Change the finished status to true
+    list.isFinished = true;
+    await list.save();
+    res.status(200).json({ list });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 
 /**
  * Delete list logic
@@ -169,7 +196,6 @@ const getCopy = async (req, res) => {
  * @param {Object} res - HTTP response object
  */
 const deleteList = async (req, res) => {
-  console.log(req.params);
   try {
     // Delete a list
     const list = await List.findByIdAndDelete({ _id: req.params.id });
@@ -190,5 +216,6 @@ module.exports = {
   editList,
   createList,
   updateList,
+  completeList,
   deleteList
 };

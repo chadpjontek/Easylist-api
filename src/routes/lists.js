@@ -40,6 +40,7 @@ router.route('/:id')
 router.route('/:id/edit')
   .get(tokenAuth(), ListsController.editList);
 
+
 // =============
 // POST REQUESTS
 // =============
@@ -72,6 +73,15 @@ router.route('/:id')
 */
 router.route('/:id/share')
   .put(tokenAuth(), ListsController.shareList);
+
+/**
+* PUT /lists/:id/complete
+* complete list route
+* Authenticate with token before calling completeList controller
+*/
+router.route('/:id/complete')
+  .put(tokenAuth(), ListsController.completeList);
+
 
 // ===============
 // DELETE REQUESTS

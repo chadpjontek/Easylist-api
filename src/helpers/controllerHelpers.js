@@ -138,6 +138,69 @@ div {
   }
 };
 
+//TODO:
+const sendListCompletionNotification = async (listName, email, username, finishedBy) => {
+  try {
+    // SMTP transport
+    const transporter = nodemailer.createTransport({
+      host: SMTP_HOST,
+      port: SMTP_PORT,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: SMTP_AUTH_USER,
+        pass: SMTP_AUTH_PASS
+      }
+    });
+
+    // Create HTML to send in email
+    const htmlBody = `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>${listName} has been completed by ${finishedBy}!</title>
+<style>
+body {
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+div {
+  background: #eee;
+}
+</style>
+</head>
+
+<body>
+<h1>Hi ${username}!</h1>
+<div>
+<p>Your list, ${listName}, has just been completed by ${finishedBy}!</p>
+</div>
+</body>
+
+</html>`;
+
+    // setup mail options
+    const mailOptions = {
+      from: MAIL_FROM, // sender address
+      to: email,
+      subject: `${listName} has been completed by ${finishedBy}!`,
+      text: `Your list, ${listName}, has just been completed by ${finishedBy}!`, // plain text body
+      html: htmlBody
+    };
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail(mailOptions);
+
+    console.log('Message sent: %s', info.messageId);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 /**
  * Create a JWT for a user.
  * @param {User} user - User object to create JWT for.
@@ -188,6 +251,7 @@ const cleanHTML = (html) => {
 module.exports = {
   sendEmailVerification,
   sendPasswordRecoveryEmail,
+  sendListCompletionNotification,
   signToken,
   createHash,
   updatePassword,

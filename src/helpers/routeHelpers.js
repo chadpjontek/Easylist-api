@@ -32,6 +32,7 @@ const schemas = {
   }),
   /** Create list validation schema */
   createList: Joi.object().keys({
+    _id: Joi.string(),
     name: Joi.string().min(1).max(24).required(),
     html: Joi.string().required(),
     backgroundColor: Joi.string().required(),
