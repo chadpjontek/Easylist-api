@@ -1,7 +1,7 @@
 const List = require('../models/list');
 const User = require('../models/user');
 const { cleanHTML, sendListCompletionNotification } = require('../helpers/controllerHelpers');
-const { PROTOCOL, DOMAIN } = require('../config');
+const { PROTOCOL, DOMAIN, NODE_ENV } = process.env;
 /**
  * Get lists logic
  * @param {Object} req - HTTP request object
@@ -125,9 +125,15 @@ const shareList = async (req, res) => {
     await list.save();
     const resMsg = list.isPrivate ? 'Your list is now private.' : 'A link to your list has been copied to your clipboard. Share it with whomever you like!';
     // TODO: remove hardcoded url
+    let link;
+    if (NODE_ENV === 'development') {
+      link = `http://localhost:8080/lists/${id}/shared`;
+    } else {
+      link = `https://easylist.link/lists/${id}/shared`;
+    }
     res.status(200).json({
       msg: resMsg,
-      link: `http://localhost:8080/lists/${id}/shared`
+      link
     });
   } catch (error) {
     throw new Error(error);

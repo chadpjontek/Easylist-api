@@ -5,10 +5,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
-const { DB_URI } = require('./config');
-
 require('dotenv').config();
 
+const { DB_URI } = process.env;
 const app = express();
 
 // Add whtelist to cors

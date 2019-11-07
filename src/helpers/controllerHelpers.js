@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sanitizeHtml = require('sanitize-html');
-const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, PROTOCOL, DOMAIN } = require('../config');
+const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, PROTOCOL, DOMAIN } = process.env;
 
 /**
  * Sends a email verification link to the supplied email
