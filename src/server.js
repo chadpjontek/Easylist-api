@@ -10,8 +10,15 @@ require('dotenv').config();
 
 const app = express();
 
-//TODO: add whtelist to cors
-app.use(cors());
+// Add whtelist to cors
+let origin;
+process.env.NODE_ENV === 'development' ? origin = 'http://localhost:8080' : origin = 'https://easylist.link';
+const corsOptions = {
+  origin,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
 
 // Connect to mongoDB with mongoose. Handle depreciation warnings.
 mongoose.connect(DB_URI, {
