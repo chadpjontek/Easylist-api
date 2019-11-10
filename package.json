@@ -1,6 +1,9 @@
 {
   "name": "easylist-api",
   "version": "1.0.0",
+  "engines": {
+    "node": "12.13.0"
+  },
   "description": "The api server for Easylist",
   "main": "server.js",
   "scripts": {
