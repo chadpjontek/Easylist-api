@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sanitizeHtml = require('sanitize-html');
-const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, PROTOCOL, DOMAIN } = process.env;
+const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, SERVER_URL } = process.env;
 
 /**
  * Sends a email verification link to the supplied email
@@ -23,7 +23,7 @@ const sendEmailVerification = async (email, username, code) => {
       }
     });
     // Create HTML to send in email
-    const verifyLink = `${PROTOCOL}://${DOMAIN}:${process.env.PORT}/api/users/email-verification/${username}/${code}`;
+    const verifyLink = `${SERVER_URL}/api/users/email-verification/${username}/${code}`;
     const htmlBody = `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -225,7 +225,7 @@ const sendPasswordRecoveryEmail = async (email, username, code) => {
     });
 
     // Create HTML to send in email
-    const pwResetLink = `${PROTOCOL}://${DOMAIN}:${process.env.PORT}/api/users/password-recovery/${username}/${code}`;
+    const pwResetLink = `${SERVER_URL}/api/users/password-recovery/${username}/${code}`;
     const htmlBody = `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional //EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -410,7 +410,13 @@ const sendPasswordRecoveryEmail = async (email, username, code) => {
   }
 };
 
-//TODO:
+/**
+ * Send a list completion email notification
+ * @param {string} listName - name of list
+ * @param {string} email - User email
+ * @param {string} username - Username
+ * @param {string} finishedBy - name of user who finished list
+ */
 const sendListCompletionNotification = async (listName, email, username, finishedBy) => {
   try {
     // SMTP transport
