@@ -8,10 +8,9 @@
   "main": "server.js",
   "scripts": {
     "test": "karma start",
-    "nodemon": "nodemon ./dist/server.js",
+    "nodemon": "nodemon ./dist/server.bundle.js",
     "watch:server": "webpack --watch --mode=development",
-    "dev": "run-p nodemon watch:server",
-    "start": "node server.js",
+    "start": "run-p nodemon watch:server",
     "build": "webpack"
   },
   "keywords": [],
