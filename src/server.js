@@ -12,13 +12,13 @@ const app = express();
 
 // Add whtelist to cors
 let origin;
-process.env.NODE_ENV === 'development' ? origin = 'http://localhost:8080' : origin = 'https://easylist.link';
+process.env.NODE_ENV === 'development' ? origin = 'http://localhost:8080' : origin = 'https://www.easylist.link';
 const corsOptions = {
   origin,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 // Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
 // see https://expressjs.com/en/guide/behind-proxies.html
@@ -36,7 +36,7 @@ app.use(limiter);
 mongoose.connect(DB_URI, {
   useNewUrlParser: true,
   useCreateIndex: true
-});
+}).catch(error => console.log(error));
 
 // Middlewares
 app.use(helmet());
