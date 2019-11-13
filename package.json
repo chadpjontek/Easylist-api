@@ -10,7 +10,8 @@
     "test": "karma start",
     "nodemon": "nodemon ./dist/server.bundle.js",
     "watch:server": "webpack --watch --mode=development",
-    "start": "run-p nodemon watch:server",
+    "dev": "run-p nodemon watch:server",
+    "start": "node server.js",
     "build": "webpack"
   },
   "keywords": [],
