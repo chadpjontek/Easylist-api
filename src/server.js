@@ -11,8 +11,7 @@ const { DB_URI } = process.env;
 const app = express();
 
 // Add whtelist to cors
-let origin;
-process.env.NODE_ENV === 'development' ? origin = 'http://localhost:8080' : origin = 'https://www.easylist.link';
+const origin = process.env.STATIC_URL;
 const corsOptions = {
   origin,
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204

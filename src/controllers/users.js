@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const { sendEmailVerification, sendPasswordRecoveryEmail, createHash, updatePassword, signToken } = require('../helpers/controllerHelpers');
 const { generateNonce } = require('../helpers');
+const { STATIC_URL } = process.env;
 
 /**
  * User sign up logic
@@ -44,19 +45,19 @@ const verify = async (req, res) => {
     const foundUser = await User.findOne({ username });
     if (!foundUser) {
       const msg = encodeURIComponent('There is no account associated with this username.');
-      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
+      return res.redirect(`${STATIC_URL}/signin/?msg=${msg}`);
     }
     // Check if the account is already verified
     if (foundUser.isVerified) {
       const msg = encodeURIComponent('This account has already been verified. You can log in now.');
-      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
+      return res.redirect(`${STATIC_URL}/signin/?msg=${msg}`);
     }
     // Check if the verification code matches the activation hash
     const isMatch = await foundUser.isVerifiedEmail(code);
     // If not, handle it
     if (!isMatch) {
       const msg = encodeURIComponent('The verification code does not match.');
-      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
+      return res.redirect(`${STATIC_URL}/signin/?msg=${msg}`);
     };
     // If verification code is older than 3 hours, reject with reason
     const currentTime = Date.now();
@@ -69,7 +70,7 @@ const verify = async (req, res) => {
       await foundUser.save();
       await sendEmailVerification(foundUser.email, username, foundUser.verificationCode.value);
       const msg = encodeURIComponent('The verification code has expired. A new code has been sent to your email.');
-      return res.redirect('http://localhost:8080/signin/?msg=' + msg);
+      return res.redirect(`${STATIC_URL}/signin/?msg=${msg}`);
     }
     // Update user as being verified and delete codes
     foundUser.isVerified = true;
@@ -78,7 +79,7 @@ const verify = async (req, res) => {
     await foundUser.save();
     // Send to sign in page with a popup message that states account being verified
     const msg = encodeURIComponent('Your account has been verified! You can now sign in.');
-    res.redirect('http://localhost:8080/signin/?msg=' + msg);
+    res.redirect(`${STATIC_URL}/signin/?msg=${msg}`);
   } catch (error) {
     throw new Error(error);
   }
