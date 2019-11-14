@@ -1,8 +1,21 @@
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
+const OAuth2 = google.auth.OAuth2;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sanitizeHtml = require('sanitize-html');
-const { JWT_SECRET, SMTP_HOST, SMTP_PORT, SMTP_AUTH_USER, SMTP_AUTH_PASS, MAIL_FROM, SERVER_URL } = process.env;
+const { GMAIL_USER, GMAIL_REFRESH_TOKEN, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, JWT_SECRET, MAIL_FROM, SERVER_URL } = process.env;
+
+const oauth2Client = new OAuth2(
+  GMAIL_CLIENT_ID, // ClientID
+  GMAIL_CLIENT_SECRET, // Client Secret
+  'https://developers.google.com/oauthplayground' // Redirect URL
+);
+
+oauth2Client.setCredentials({
+  refresh_token: GMAIL_REFRESH_TOKEN
+});
+const accessToken = oauth2Client.getAccessToken();
 
 /**
  * Sends a email verification link to the supplied email
@@ -14,12 +27,14 @@ const sendEmailVerification = async (email, username, code) => {
   try {
     // SMTP transport
     const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: true, // true for 465, false for other ports
+      service: 'gmail',
       auth: {
-        user: SMTP_AUTH_USER,
-        pass: SMTP_AUTH_PASS
+        type: 'OAuth2',
+        user: GMAIL_USER,
+        clientId: GMAIL_CLIENT_ID,
+        clientSecret: GMAIL_CLIENT_SECRET,
+        refreshToken: GMAIL_REFRESH_TOKEN,
+        accessToken
       }
     });
     // Create HTML to send in email
@@ -215,12 +230,14 @@ const sendPasswordRecoveryEmail = async (email, username, code) => {
   try {
     // SMTP transport
     const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: true, // true for 465, false for other ports
+      service: 'gmail',
       auth: {
-        user: SMTP_AUTH_USER,
-        pass: SMTP_AUTH_PASS
+        type: 'OAuth2',
+        user: GMAIL_USER,
+        clientId: GMAIL_CLIENT_ID,
+        clientSecret: GMAIL_CLIENT_SECRET,
+        refreshToken: GMAIL_REFRESH_TOKEN,
+        accessToken
       }
     });
 
@@ -421,12 +438,14 @@ const sendListCompletionNotification = async (listName, email, username, finishe
   try {
     // SMTP transport
     const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: SMTP_PORT,
-      secure: true, // true for 465, false for other ports
+      service: 'gmail',
       auth: {
-        user: SMTP_AUTH_USER,
-        pass: SMTP_AUTH_PASS
+        type: 'OAuth2',
+        user: GMAIL_USER,
+        clientId: GMAIL_CLIENT_ID,
+        clientSecret: GMAIL_CLIENT_SECRET,
+        refreshToken: GMAIL_REFRESH_TOKEN,
+        accessToken
       }
     });
 
