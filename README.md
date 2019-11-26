@@ -13,7 +13,7 @@ The EasyList API works with [EasyList](https://www.easylist.link) and designed a
 *  DELETE
 *  PUT
 ### lists
-`/users`
+`/lists`
 *  GET
 *  POST
 *  DELETE
