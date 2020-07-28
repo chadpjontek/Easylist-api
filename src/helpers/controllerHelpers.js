@@ -1,21 +1,21 @@
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const OAuth2 = google.auth.OAuth2;
+// const { google } = require('googleapis');
+// const OAuth2 = google.auth.OAuth2;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sanitizeHtml = require('sanitize-html');
-const { GMAIL_USER, GMAIL_REFRESH_TOKEN, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, JWT_SECRET, MAIL_FROM, SERVER_URL } = process.env;
+const { GMAIL_USER, GMAIL_PASS, GMAIL_REFRESH_TOKEN, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, JWT_SECRET, MAIL_FROM, SERVER_URL } = process.env;
 
-const oauth2Client = new OAuth2(
-  GMAIL_CLIENT_ID, // ClientID
-  GMAIL_CLIENT_SECRET, // Client Secret
-  'https://developers.google.com/oauthplayground' // Redirect URL
-);
+// const oauth2Client = new OAuth2(
+//   GMAIL_CLIENT_ID, // ClientID
+//   GMAIL_CLIENT_SECRET, // Client Secret
+//   'https://developers.google.com/oauthplayground' // Redirect URL
+// );
 
-oauth2Client.setCredentials({
-  refresh_token: GMAIL_REFRESH_TOKEN
-});
-const accessToken = oauth2Client.getAccessToken();
+// oauth2Client.setCredentials({
+//   refresh_token: GMAIL_REFRESH_TOKEN
+// });
+// const accessToken = oauth2Client.getAccessToken();
 
 /**
  * Sends a email verification link to the supplied email
@@ -29,13 +29,17 @@ const sendEmailVerification = async (email, username, code) => {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        type: 'OAuth2',
         user: GMAIL_USER,
-        clientId: GMAIL_CLIENT_ID,
-        clientSecret: GMAIL_CLIENT_SECRET,
-        refreshToken: GMAIL_REFRESH_TOKEN,
-        accessToken
+        pass: GMAIL_PASS
       }
+      // auth: {
+      //   type: 'OAuth2',
+      //   user: GMAIL_USER,
+      //   clientId: GMAIL_CLIENT_ID,
+      //   clientSecret: GMAIL_CLIENT_SECRET,
+      //   refreshToken: GMAIL_REFRESH_TOKEN,
+      //   accessToken
+      // }
     });
     // Create HTML to send in email
     const verifyLink = `${SERVER_URL}/api/users/email-verification/${username}/${code}`;
