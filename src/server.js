@@ -32,10 +32,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Connect to mongoDB with mongoose. Handle depreciation warnings.
-mongoose.connect(DB_URI, {
-  useNewUrlParser: true,
-  useCreateIndex: true
-}).catch(error => console.log(error));
+mongoose.connect(DB_URI).catch(error => console.log(error));
 
 // Middlewares
 app.use(helmet());
